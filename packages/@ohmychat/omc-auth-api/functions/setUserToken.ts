@@ -1,4 +1,6 @@
 import getUserTokens from "./getUserTokens";
+import generateRandomCode from "./generateRandomCode";
+import cookie_options from "../constants/cookie_options";
 
 function setUserToken(res, req, token) {
     const existingTokens = getUserTokens(req);

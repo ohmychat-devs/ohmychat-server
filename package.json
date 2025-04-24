@@ -12,6 +12,10 @@
   },
   "workspaces": [
     "apps/*",
-    "packages/@ohmychat/*"
-  ]
+    "packages/@ohmychat/*",
+    "packages/ohmychat-apps"
+  ],
+  "dependencies": {
+    "@legendapp/state": "^3.0.0-beta.30"
+  }
 }

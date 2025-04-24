@@ -1,0 +1,1 @@
+export const msgsSorter = (b: any, a: any) => new Date(b.published_at ?? b.created_at ?? b.typed_at).getTime() - new Date(a.published_at ?? a.created_at ?? a.typed_at).getTime();

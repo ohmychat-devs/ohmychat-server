@@ -1,10 +1,10 @@
 import { supabase } from "@ohmychat/ohmychat-backend-core";
 
-const setTyping = function(status, channelSrcID) {
+const setTyping = function({ status, source }) {
     supabase
         .from('chat_group_typing')
         .upsert({
-            source: channelSrcID,
+            source,
             status,
             date: new Date().toISOString(),
         }, { onConflict: 'source' })

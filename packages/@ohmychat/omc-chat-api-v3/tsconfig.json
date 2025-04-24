@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "target": "es2024",
+        "moduleResolution": "node10",
+        "allowSyntheticDefaultImports": true,
+        "skipLibCheck": false,
+    }
+}

@@ -13,8 +13,6 @@ const membersChanges = async (payload) => {
     } else {
         if (!data || !data?.group) return;
 
-        console.log(payload.new);
-
         data.group.members.forEach(({ user : { id } }) => io.of(namespaceAuth).to('user/' + id).emit('incoming/member', payload.new));
     }
 }

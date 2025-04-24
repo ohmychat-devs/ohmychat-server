@@ -1,0 +1,26 @@
+import { supabase } from "@ohmychat/ohmychat-backend-core";
+import { eventEmitter } from "../events/emitter";
+
+/**
+ * Gère les changements sur la table `chat_group_messages` et notifie les membres du groupe.
+ *
+ * @async
+ * @param {Object} payload - Données de l'événement Supabase (inclut l'état `new` du message).
+ * @returns {Promise<void>}
+ *
+ * Pour chaque membre du groupe, émet un événement `incoming_<userId>` avec le type 'message' et les nouvelles données du message.
+ */
+export const messagesChanges = async (payload) => {
+    const { data, error } = await supabase
+        .from('chat_group_messages')
+        .select(`source(group(members:chat_group_members(user(id))))`)
+        .eq('id', payload.new.id)
+        .single()
+
+    if (error) {
+        console.log(error);
+    } else {
+        if (!data || !data?.source) return;
+        data.source.group.members.forEach(({ user : { id } }) => eventEmitter.emit('incoming_'+id, 'message', payload.new)) ;
+    }
+};

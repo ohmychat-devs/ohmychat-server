@@ -8,6 +8,8 @@ import groupChanges from "./functions/groupChanges";
 import userChanges from "./functions/userChanges";
 import setTyping from "./functions/setTyping";
 import setMessage from "./functions/setMessage";
+import setseen from "./functions/setSeen";
+import jwt from "jsonwebtoken";
 
 supabase.channel('ohmychat-realtime-messages')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_group_messages' }, messagesChanges)
@@ -24,20 +26,35 @@ supabase.channel('ohmychat-realtime-messages')
 
 io.of(namespaceAuth).on('connection', async function(socket) {
     let currentToken;
+
+    socket.on('hello', function(data, callback) {
+        callback(data);
+    });
     
-    socket.on('chat_init', async function(token, callback) {
-        console.log(socket.id, token);
-        if (currentToken) socket.leave('user/' + currentToken);
-
-        currentToken = token;
-        socket.join('user/' + token);
-
-        callback(await fetchChat(token))
+    socket.on('chat_init', async function(tokens, callback) {
+        try {
+            callback(await (Array.isArray(tokens) ? tokens : [tokens]).reduce(async (accP, token) => {
+                const acc = await accP;
+            
+                console.log('token', token);
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                const id = decoded?.id;
+            
+                if (!id) return acc;
+            
+                socket.join('user/' + id);
+                const chat = await fetchChat(id);
+            
+                return { ...acc, [id]: chat };
+            }, Promise.resolve({})));
+        } catch (error) {
+            console.error(error);
+        }
     });
 
     socket.on('set/typing', setTyping);
 
-    socket.on('set/seen', function() {});
+    socket.on('set/seen', setseen);
 
     socket.on('set/message', setMessage);
         

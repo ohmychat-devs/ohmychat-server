@@ -1,6 +1,6 @@
 import { server } from "@ohmychat/ohmychat-backend-core";
 
-import "@ohmychat/ohmychat-chat-api-v2";
+import "@ohmychat/ohmychat-chat-api-v3";
 import "@ohmychat/ohmychat-auth-api";
 import "@ohmychat/ohmychat-search-api";
 import "@ohmychat/ohmychat-relations-api";

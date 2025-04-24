@@ -1,6 +1,6 @@
 import { supabase } from "@ohmychat/ohmychat-backend-core";
 
-export const getProfile = async (user_id: string) => {
+export const getProfile = async (user_id: string, callback) => {
     const { data, error } = await supabase
         .from("users")
         .select("*")
@@ -11,7 +11,7 @@ export const getProfile = async (user_id: string) => {
         console.error("❌ Erreur lors de la récupération du profil :", error);
         return null;
     }
-    return data;
+    return callback(data);
 }
 
 export const setProfile = async (user_id: string, profile: any) => {
