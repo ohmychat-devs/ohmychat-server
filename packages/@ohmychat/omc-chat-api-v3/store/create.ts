@@ -1,8 +1,10 @@
 import { observable } from "@legendapp/state";
-import { populateStore } from "../functions/populateStore";
-import { syncStore } from "../functions/syncStore";
+import { populateStore } from "./populate";
+import { syncStore } from "./sync";
 import { createObservables } from "./store";
 import { createChatList$ } from "./chatList";
+import { eventEmitter } from "../events/emitter";
+import { msgsSorter } from "../functions/msgsSorter";
 
 /**
  * Crée un magasin de chat avec des observables pour les messages, les groupes, les membres, les utilisateurs et les saisies.
@@ -18,8 +20,12 @@ export const createStore = function () {
      */
     const init = async (id) => {
         await populateStore(store, id);
-        const { off } = await syncStore(store, id);
-        return off;
+        const handler = await syncStore(store, id);
+
+        eventEmitter.on('incoming_'+id, handler);
+        return () => {
+            eventEmitter.off('incoming_'+id, handler);
+        }
     };
     
     /**
@@ -34,11 +40,19 @@ export const createStore = function () {
      * @param {string} id L'ID de groupe.
      * @returns {Observable} Un observable qui  mit la conversation.
      */
-    const conversation$ = (id) => observable(() => store.messagesByGroup$.get()[id]);
+    const chatBox$ = (id) => observable(() => {
+        const messages = store.messagesByGroup$.get()[id];
+        return messages?.sort(msgsSorter).filter(m => m.status !== null).map(m => {
+            let source = store.sourcesByID$.get()[m.source]?.user;
+            source = store.users$.get()[source];
+            return { ...m, source };
+        });
+    });
 
     return {
         chatList$,
-        conversation$,
-        init
+        chatBox$,
+        init,
+        ...store
     };
 }

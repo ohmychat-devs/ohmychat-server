@@ -17,6 +17,7 @@ export const createChatList$ = (store: ChatStoreObservables, user: string) => {
 
         const { groups } = data;
 
+        //return [...groups, ...groups, ...groups, ...groups, ...groups, ...groups, ...groups, ...groups, ...groups, ...groups].map(chat => formatChat(chat, user, data));
         return groups.map(chat => formatChat(chat, user, data));
     });
 };

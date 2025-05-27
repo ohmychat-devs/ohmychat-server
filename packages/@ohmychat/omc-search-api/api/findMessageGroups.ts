@@ -8,7 +8,8 @@ export default async function (id: string, query: string) : Promise<{ messages?:
             name,
             members:chat_group_members!inner(
                 user:users!inner(id, username, displayname),
-                messages:chat_group_messages!chat_group_messages_source_fkey(*)
+                group:chat_groups!inner(id, name),
+                messages:chat_group_messages!chat_group_messages_source_fkey(*, source(*))
             )
         )`)
         .eq('user', id);

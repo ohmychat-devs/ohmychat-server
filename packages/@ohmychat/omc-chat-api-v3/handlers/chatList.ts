@@ -19,28 +19,32 @@ export const handleChatList = (socket, subscriptions, store) => {
         if (!userId) return socket.disconnect(true);
 
         console.log(`socket ${socket.id} joined chat for user ${userId}`);
+        socket.join(userId);
 
         const unsubscribe = await init(userId);
         const sub = chatList$(userId).onChange(({ value }) => {
             socket.emit("chatList", value);
         }, { immediate: true, initial: true });
 
-        socket.join(userId);
 
         subscriptions.set(userId, () => {
+            console.log('nettoie');
             sub();
             unsubscribe();
         });
+    });
 
-        socket.on("chatList_leave", (userId) => {
-            console.log(`socket ${socket.id} left chat for user ${userId}`);
-            socket.leave(userId);
-        
-            const cleanup = subscriptions.get(userId);
-            if (cleanup) {
-                cleanup();
-                subscriptions.delete(userId);
-            }
-        });
+    socket.on("chatList_leave", async (token) => {
+        const userId = await verifyToken(token);
+        if (!userId) return socket.disconnect(true);
+
+        console.log(`socket ${socket.id} left chat for user ${userId}`);
+        socket.leave(userId);
+    
+        const cleanup = subscriptions.get(userId);
+        if (cleanup) {
+            cleanup();
+            subscriptions.delete(userId);
+        }
     });
 };

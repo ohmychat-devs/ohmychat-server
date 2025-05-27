@@ -1,6 +1,9 @@
+import { verifyToken } from "@ohmychat/ohmychat-auth-api";
 import { supabase } from "@ohmychat/ohmychat-backend-core";
 
-export const getPreferences = async (user_id: string) => {
+export const getPreferences = async (token: string, callback) => {
+    const user_id = await verifyToken(token);
+
     const { data, error } = await supabase
         .from("users_preferences")
         .select("*")
@@ -11,18 +14,21 @@ export const getPreferences = async (user_id: string) => {
         console.error("❌ Erreur lors de la récupération des préférences :", error);
         return null;
     }
-    return data;
+    return callback(data);
 }
 
-export const setPreferences = async (user_id: string, preferences: any) => {
+export const setPreferences = async (token: string, preferences: any, callback) => {
+    const user_id = await verifyToken(token);
+
     const { data, error } = await supabase
         .from("users_preferences")
         .upsert({ user_id, ...preferences }, { onConflict: "user_id" })
+        .select()
         .maybeSingle();
 
     if (error) {
         console.error("❌ Erreur lors de la mise à jour des préférences :", error);
         return null;
     }
-    return data;
+    return callback(data);
 }

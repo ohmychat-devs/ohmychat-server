@@ -11,7 +11,7 @@ export const getLatestDate = function (chat: any): number {
   
     if (Array.isArray(typing)) {
       typing.forEach(t => {
-        if (t.date) {
+        if (t?.date) {
           dates.push(new Date(t.date));
         }
       });

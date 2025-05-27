@@ -13,17 +13,19 @@ export function getChatData(store, userId): UserChatData {
     } = store;
 
     const groups = groupsByUsers$.get()[userId];
-    const members = groups.flatMap(g => sourcesByGroup$.get()[g?.id]);
-    const users = members.flatMap(i => users$.get()[i?.user]).reduce((acc, user) => {
-        acc[user.id] = user;
+    if (!groups) return null;
+    
+    const members = groups?.flatMap(g => sourcesByGroup$.get()[g?.id]);
+    const users = members?.flatMap(i => users$.get()[i?.user]).reduce((acc, user) => {
+        acc[user?.id] = user;
         return acc;
     }, {});
 
-    const messages = groups.flatMap(g => messagesByGroup$.get()[g?.id]).filter(m => m.status !== null);
-    const typing = groups.flatMap(g => typingByGroups$.get()[g?.id]);
+    const messages = groups?.flatMap(g => messagesByGroup$.get()[g?.id]).filter(m => m?.status !== null);
+    const typing = groups?.flatMap(g => typingByGroups$.get()[g?.id]).filter(t => t?.status !== null);
 
-    const membersById = Object.groupBy(members, (m: Member) => m.id);
-    const messagesByGroup = Object.groupBy(messages, (m: Message) => membersById[m.source]?.[0]?.group);
+    const membersById = Object.groupBy(members, (m: Member) => m?.id);
+    const messagesByGroup = Object.groupBy(messages, (m: Message) => membersById[m?.source]?.[0]?.group);
 
     return { groups, members, users, messages, typing, messagesByGroup };
 }

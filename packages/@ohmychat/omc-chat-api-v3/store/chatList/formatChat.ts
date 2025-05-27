@@ -14,11 +14,11 @@ import { UserChatData } from "../../types";
  * @returns {Object} Objet formaté contenant id, name, description, lastActivity et unreadMessagesCount.
  */
 export function formatChat(chat, userId, { messagesByGroup, typing, members, users }: UserChatData) {
-    const lastMessage = messagesByGroup[chat.id]?.toSorted(msgsSorter).at(-1);
-    const enrichedChat = { ...chat, lastMessage, typing, members, users, messages: messagesByGroup[chat.id] || [] };
+    const lastMessage = messagesByGroup[chat?.id]?.toSorted(msgsSorter).at(-1);
+    const enrichedChat = { ...chat, lastMessage, typing, members, users, messages: messagesByGroup[chat?.id] || [] };
   
     return {
-      id: chat.id,
+      id: chat?.id,//+`${Math.random().toString(36).substring(2, 9)}`,
       name: getGroupName(enrichedChat, userId),
       description: getChatDescription(enrichedChat),
       lastActivity: getLatestDate(enrichedChat),

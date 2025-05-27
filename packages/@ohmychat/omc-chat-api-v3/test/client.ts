@@ -15,6 +15,7 @@ const connectTest = function (token) {
 
     socketClient.on("chatList", (data) => {
         console.log(data);
+        socketClient.emit('chatList_leave', token);
     });
 
     socketClient.on("conversation-data", (data) => {

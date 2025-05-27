@@ -1,17 +1,18 @@
-import { eventEmitter } from "../events/emitter";
 import { Member, Group, Typing, Message } from "../types";
 
-export const syncStore = async ({members$, groups$, typing$, messages$, users$}, id) => {
-    function updateListById(prevList, payload) {
-        const map = new Map(prevList.map(item => [item.id, item]));
-        map.set(payload.id, payload);
-        return [...map.values()];
-    }
-    
-    function updateRecordById(prevRecord, payload) {
-        return { ...prevRecord, [payload.id]: payload };
-    }
+function updateListById(prevList, payload) {
+    const map = new Map(prevList.map(item => [item.id, item]));
+    map.set(payload.id, payload);
+    return [...map.values()];
+}
 
+function updateRecordById(prevRecord, payload) {
+    return { ...prevRecord, [payload.id]: payload };
+}
+
+export const syncStore = async ({members$, groups$, typing$, messages$, users$}, id) => {
+    console.log('sync store', id);
+    
     const handler = (type, payload) => {
         switch (type) {
             case 'message':
@@ -39,9 +40,5 @@ export const syncStore = async ({members$, groups$, typing$, messages$, users$},
         }
     }
 
-    eventEmitter.on('incoming_'+id, handler);
-
-    return {
-        off: () => eventEmitter.off('incoming_'+id, handler)
-    }
+    return handler;
 };

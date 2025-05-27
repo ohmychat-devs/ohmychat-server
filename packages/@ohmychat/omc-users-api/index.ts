@@ -15,9 +15,8 @@ io.of("/users").on("connection", function (socket) {
     socket.on("preferences/get", getPreferences);
     socket.on("preferences/set", setPreferences);
 
-    socket.on("profile/set", setProfile);
     socket.on("profile/get", getProfile);
-
+    socket.on("profile/token/set", setProfile);
     socket.on("profile/token/get", getTokenProfile);
 
     socket.on("disconnect", function () {

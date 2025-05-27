@@ -1,5 +1,18 @@
 import { supabase } from "@ohmychat/ohmychat-backend-core";
 
+function mergeById<T extends { id: string | number }>(
+    prev: T[],
+    incomingMap: Map<string | number, T>
+  ): T[] {
+    const map = new Map(prev.map(item => [item.id, item]));
+  
+    for (const [id, item] of incomingMap) {
+      map.set(id, item);
+    }
+  
+    return Array.from(map.values());
+}
+
 export const populateStore = async ({members$, groups$, typing$, messages$, users$}, id) => {
     const membersMap = new Map();
     const groupsMap = new Map();
@@ -41,9 +54,9 @@ export const populateStore = async ({members$, groups$, typing$, messages$, user
     });
     
     // Merge maps into observables
-    members$.set([...membersMap.values()]);
-    groups$.set([...groupsMap.values()]);
-    typing$.set([...typingMap.values()]);
-    messages$.set([...messagesMap.values()]);
-    users$.set(Object.fromEntries(usersMap));
+    members$.set(prev => mergeById(prev, membersMap));
+    groups$.set(prev => mergeById(prev, groupsMap));
+    typing$.set(prev => mergeById(prev, typingMap));
+    messages$.set(prev => mergeById(prev, messagesMap));
+    users$.set(prev => ({ ...prev, ...Object.fromEntries(usersMap) }));
 }

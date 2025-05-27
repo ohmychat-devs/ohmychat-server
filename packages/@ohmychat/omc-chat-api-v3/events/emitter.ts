@@ -1,4 +1,4 @@
-import EventEmitter from "events";
+import EventEmitter from "eventemitter3";
 
 /**
  * Instance d'EventEmitter utilisée pour gérer l'architecture des évènements.
